@@ -83,7 +83,6 @@ def collect_scores(model, loader, device, return_embeddings=False) -> Dict:
 
 
 def find_best_threshold(labels: np.ndarray, scores: np.ndarray, cfg) -> Tuple[float, float]:
-    """Find the threshold on a labelled set that minimises tDCF.
 
     Returns (best_threshold, best_tdcf).
     Uses direct index alignment between roc_curve outputs — no searchsorted.
