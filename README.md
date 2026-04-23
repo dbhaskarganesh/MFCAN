@@ -237,7 +237,7 @@ Comparing feature combinations on ASVspoof 2019 LA eval set:
 
 ## 📄 License
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
+Distributed under the **Apache License 2.0**. See [`LICENSE`](LICENSE) for more information.
 
 ---
 
