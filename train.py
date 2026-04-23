@@ -103,13 +103,7 @@ def evaluate(model, loader, device, cfg) -> Dict[str, float]:
 
 @torch.no_grad()
 def calibrate_threshold(model, dev_loader, device, cfg) -> float:
-    """Find the score threshold on the dev set that minimises tDCF.
-
-    Fixed version: iterates over roc_curve outputs using aligned indices
-    instead of the broken searchsorted approach that produced degenerate
-    thresholds like -1.619 (which classified everything as bonafide).
-    Includes a sanity check that rejects degenerate solutions.
-    """
+    
     from sklearn.metrics import roc_curve
 
     model.eval()
