@@ -7,12 +7,7 @@ import torch.nn as nn
 
 
 class CrossAttentionLayer(nn.Module):
-    """Cross-attention between two feature sequences.
 
-    Now operates on (B, N, D) sequences where N=16 spatial positions,
-    producing (B, N, N) attention weight maps that are actually informative.
-    Previously N=1 forced all weights to 1.000.
-    """
 
     def __init__(self, embed_dim: int, num_heads: int, dropout: float = 0.1) -> None:
         super().__init__()
@@ -27,16 +22,7 @@ class CrossAttentionLayer(nn.Module):
         self.last_attn_weights: Optional[torch.Tensor] = None
 
     def forward(self, query: torch.Tensor, context: torch.Tensor) -> torch.Tensor:
-        """
-        Parameters
-        ----------
-        query   : (B, N, D)  — sequence being refined
-        context : (B, N, D)  — sequence being attended to
 
-        Returns
-        -------
-        (B, N, D) refined query sequence
-        """
         attended, weights = self.attn(query=query, key=context, value=context)
         self.last_attn_weights = weights.detach()   # (B, N_q, N_k) — now meaningful
         return self.norm(query + self.dropout(attended))
@@ -60,7 +46,7 @@ class FeedForward(nn.Module):
 
 
 class BidirectionalCrossAttentionLayer(nn.Module):
-    """One layer of bidirectional cross-attention over three feature sequences."""
+   
 
     def __init__(self, embed_dim: int, num_heads: int, dropout: float = 0.1) -> None:
         super().__init__()
@@ -97,7 +83,6 @@ class BidirectionalCrossAttentionLayer(nn.Module):
 
 
 class CrossAttentionFusion(nn.Module):
-    """Stack of BidirectionalCrossAttentionLayers operating on spatial sequences."""
 
     def __init__(
         self,
