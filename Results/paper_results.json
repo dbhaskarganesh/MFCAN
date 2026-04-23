@@ -1,0 +1,181 @@
+{
+  "experiment": {
+    "title": "MFCAN: Multi-Feature Cross-Attention Network for Audio Deepfake Detection",
+    "dataset": "ASVspoof 2019 Logical Access (LA)",
+    "timestamp": "2026-04-22 21:07:07",
+    "checkpoint_path": "./checkpoints/mfcan_best.pt",
+    "best_epoch": 12,
+    "val_eer_at_best": 0.0,
+    "val_tdcf_at_best": 0.0,
+    "calibrated_threshold": -0.350323,
+    "threshold_source": "dev-set tDCF minimisation (re-calibrated at eval time)"
+  },
+  "model_info": {
+    "architecture": "MFCAN v2",
+    "features": [
+      "Mel-Spectrogram",
+      "LFCC (60+delta+delta-delta)",
+      "CQT (84 bins)"
+    ],
+    "embed_dim": 256,
+    "cross_attention_heads": 8,
+    "cross_attention_layers": 2,
+    "attention_seq_len": 16,
+    "se_reduction": 16,
+    "total": 8241200,
+    "trainable": 8241200,
+    "frozen": 0
+  },
+  "training_config": {
+    "epochs_trained": 12,
+    "max_epochs": 50,
+    "batch_size": 32,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0001,
+    "scheduler": "CosineAnnealingWarmRestarts",
+    "early_stopping_patience": 10,
+    "loss_function": "focal",
+    "focal_gamma": 2.0,
+    "inconsistency_loss_weight": 0.1
+  },
+  "primary_metrics": {
+    "EER_%": 8.5903,
+    "min_tDCF": 0.9982,
+    "AUC_ROC": 0.9698,
+    "accuracy": 0.7393
+  },
+  "detailed_metrics": {
+    "eer_pct": 8.5903,
+    "min_tdcf": 0.9982,
+    "auc_roc": 0.9698,
+    "accuracy": 0.7393,
+    "precision_macro": 0.6413,
+    "recall_macro": 0.853,
+    "f1_macro": 0.6355,
+    "precision_weighted": 0.9255,
+    "recall_weighted": 0.7393,
+    "f1_weighted": 0.7899,
+    "precision_spoof": 0.9994,
+    "recall_spoof": 0.7097,
+    "f1_spoof": 0.83,
+    "precision_bonafide": 0.2832,
+    "recall_bonafide": 0.9963,
+    "f1_bonafide": 0.4411
+  },
+  "per_class_metrics": {
+    "spoof": {
+      "precision": 0.9994,
+      "recall": 0.7097,
+      "f1": 0.83,
+      "n_samples": 63882
+    },
+    "bonafide": {
+      "precision": 0.2832,
+      "recall": 0.9963,
+      "f1": 0.4411,
+      "n_samples": 7355
+    }
+  },
+  "confusion_matrix": {
+    "true_negative": 45338,
+    "false_positive": 18544,
+    "false_negative": 27,
+    "true_positive": 7328,
+    "matrix": [
+      [
+        45338,
+        18544
+      ],
+      [
+        27,
+        7328
+      ]
+    ],
+    "labels": [
+      "spoof(0)",
+      "bonafide(1)"
+    ]
+  },
+  "dataset_stats": {
+    "eval_set_total": 71237,
+    "n_spoof": 63882,
+    "n_bonafide": 7355,
+    "spoof_ratio_%": 89.68
+  },
+  "tdcf_cost_params": {
+    "Pspoof": 0.05,
+    "Cmiss": 1,
+    "Cfa": 10
+  },
+  "environment": {
+    "python_version": "3.13.12",
+    "pytorch_version": "2.11.0+cu130",
+    "cuda_available": false,
+    "cuda_device": "N/A"
+  },
+  "ablation_study": {
+    "only_mel": {
+      "EER_%": 13.4581,
+      "min_tDCF": 0.9974,
+      "AUC_ROC": 0.9372,
+      "accuracy": 0.6853,
+      "f1_macro": 0.5909
+    },
+    "only_lfcc": {
+      "EER_%": 10.2017,
+      "min_tDCF": 0.982,
+      "AUC_ROC": 0.9607,
+      "accuracy": 0.8583,
+      "f1_macro": 0.7502
+    },
+    "only_cqt": {
+      "EER_%": 10.3454,
+      "min_tDCF": 0.8894,
+      "AUC_ROC": 0.9624,
+      "accuracy": 0.9178,
+      "f1_macro": 0.8162
+    },
+    "mel_lfcc": {
+      "EER_%": 8.0345,
+      "min_tDCF": 0.9697,
+      "AUC_ROC": 0.9748,
+      "accuracy": 0.778,
+      "f1_macro": 0.6695
+    },
+    "mel_cqt": {
+      "EER_%": 7.4808,
+      "min_tDCF": 0.9728,
+      "AUC_ROC": 0.9739,
+      "accuracy": 0.8602,
+      "f1_macro": 0.7527
+    },
+    "lfcc_cqt": {
+      "EER_%": 7.8984,
+      "min_tDCF": 0.9179,
+      "AUC_ROC": 0.975,
+      "accuracy": 0.895,
+      "f1_macro": 0.7961
+    },
+    "no_cross_attention": {
+      "EER_%": 9.7789,
+      "min_tDCF": 0.9624,
+      "AUC_ROC": 0.9623,
+      "accuracy": 0.9234,
+      "f1_macro": 0.823
+    },
+    "full_mfcan": {
+      "EER_%": 8.5903,
+      "min_tDCF": 0.9982,
+      "AUC_ROC": 0.9698,
+      "accuracy": 0.7393,
+      "f1_macro": 0.6355
+    },
+    "_summary": {
+      "best_condition": "mel_cqt",
+      "best_eer_%": 7.4808,
+      "full_model_eer_%": 8.5903,
+      "gain_over_only_mel": 4.8679
+    }
+  }
+}

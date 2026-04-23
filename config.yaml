@@ -1,0 +1,109 @@
+project:
+  name: "MFCAN"
+  seed: 42
+  device: "auto"
+  use_amp: true
+  multi_gpu: false
+
+data:
+  root_dir: "/home/user/mc55582/Project/data"
+  protocol_dir: "/home/user/mc55582/Project/data/ASVspoof2019_LA_cm_protocols"
+  train_protocol: "ASVspoof2019.LA.cm.train.trn.txt"
+  dev_protocol:   "ASVspoof2019.LA.cm.dev.trl.txt"
+  eval_protocol:  "ASVspoof2019.LA.cm.eval.trl.txt"
+  sample_rate: 16000
+  max_duration: 4.0
+  num_workers: 4
+  pin_memory: true
+
+features:
+  output_size: [128, 128]
+
+  mel:
+    n_mels: 128
+    n_fft: 1024
+    win_length: 1024
+    hop_length: 256
+    fmax: 8000
+    power: 2.0
+    top_db: 80.0
+
+  lfcc:
+    n_filter: 70
+    n_lfcc: 60
+    n_fft: 512
+    hop_length: 256
+    win_length: 512
+    with_delta: true
+
+  cqt:
+    bins_per_octave: 12
+    n_bins: 84
+    hop_length: 256
+    fmin: 32.70
+
+  augment:
+    enabled: true
+    freq_mask_param: 27
+    time_mask_param: 40
+    num_freq_masks: 2
+    num_time_masks: 2
+
+model:
+  embed_dim: 256
+  seq_len: 16
+
+  encoder:
+    se_reduction: 16
+
+  cross_attention:
+    num_heads: 8
+    dropout: 0.1
+    num_layers: 2
+
+  classifier:
+    hidden_dims: [512, 128]
+    dropout: [0.3, 0.2]
+
+loss:
+  type: "focal"
+  focal_gamma: 2.0
+  inconsistency_weight: 0.1
+  label_smoothing: 0.05
+
+training:
+  epochs: 50
+  batch_size: 32
+  optimizer:
+    name: "AdamW"
+    lr: 1.0e-4
+    weight_decay: 1.0e-4
+    betas: [0.9, 0.999]
+  scheduler:
+    name: "CosineAnnealingWarmRestarts"
+    T_0: 5
+    T_mult: 2
+    eta_min: 1.0e-6
+  gradient_clip_norm: 1.0
+  early_stopping:
+    patience: 10
+    monitor: "val_eer"
+  save_dir: "./checkpoints"
+  best_model_name: "mfcan_best.pt"
+  last_model_name: "mfcan_last.pt"
+
+logging:
+  use_wandb: true
+  wandb_project: "audio-deepfake-detection"
+  wandb_entity: null
+  log_interval: 10
+
+evaluation:
+  checkpoint: "./checkpoints/mfcan_best.pt"
+  output_dir: "./results"
+  tsne_n_samples: 2000
+
+tdcf:
+  Pspoof: 0.05
+  Cmiss: 1
+  Cfa: 10
