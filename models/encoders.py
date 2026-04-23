@@ -52,15 +52,7 @@ class ConvBlock(nn.Module):
 
 
 class CNNEncoder(nn.Module):
-    """CNN encoder that outputs BOTH a spatial sequence and a pooled embedding.
-
-    The spatial sequence (B, seq_len, embed_dim) feeds into cross-attention,
-    giving attention weights over 16 meaningful spatial positions instead of
-    a single scalar — this is what fixes the attention collapse.
-
-    After cross-attention, the sequence is average-pooled back to (B, embed_dim).
-    """
-
+    
     def __init__(
         self,
         in_channels: int = 1,
@@ -88,23 +80,7 @@ class CNNEncoder(nn.Module):
         nn.init.trunc_normal_(self.pos_emb, std=0.02)
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        """
-        Parameters
-        ----------
-        x : (B, 1, 128, 128)
 
-        Returns
-        -------
-        pooled : (B, embed_dim)          — for auxiliary classifier heads
-        seq    : (B, 16, embed_dim)      — for cross-attention fusion
-        """
-        x = self.block1(x)   # (B, 32,  64, 64)
-        x = self.block2(x)   # (B, 64,  32, 32)
-        x = self.block3(x)   # (B, 128, 16, 16)
-        x = self.block4(x)   # (B, 256,  4,  4)
-
-        B, C, H, W = x.shape
-        # Reshape spatial grid to sequence: (B, H*W, C) = (B, 16, 256)
         seq = x.flatten(2).transpose(1, 2)
         seq = self.seq_proj(seq)          # (B, 16, embed_dim)
         seq = seq + self.pos_emb          # add learnable positional embedding
