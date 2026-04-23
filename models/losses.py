@@ -22,14 +22,6 @@ class AuxClassifier(nn.Module):
 
 
 class FocalLoss(nn.Module):
-    """Focal Loss (Lin et al., 2017) — down-weights easy examples so the model
-    stops over-optimising on the majority class (bonafide) and pays more
-    attention to the harder spoof samples.
-
-    FL(p_t) = -alpha_t * (1 - p_t)^gamma * log(p_t)
-
-    gamma=2 is the standard choice. Higher gamma = more focus on hard examples.
-    """
 
     def __init__(
         self,
@@ -43,7 +35,6 @@ class FocalLoss(nn.Module):
         self.label_smoothing = label_smoothing
 
     def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
-        # Standard CE gives log(p_t) per sample
         ce = F.cross_entropy(
             logits, targets,
             weight=self.weight,
@@ -56,7 +47,6 @@ class FocalLoss(nn.Module):
 
 
 class FeatureInconsistencyLoss(nn.Module):
-    """Jensen-Shannon divergence across three stream predictions."""
 
     def __init__(self, reduction: str = "mean") -> None:
         super().__init__()
@@ -89,14 +79,7 @@ class FeatureInconsistencyLoss(nn.Module):
 
 
 class MFCANLoss(nn.Module):
-    """Full training objective.
 
-    L_total = L_main (focal) + L_aux (focal) + lambda * L_inconsistency
-
-    Using Focal Loss instead of CrossEntropy fixes the bonafide-bias by
-    reducing the gradient contribution of easy bonafide examples and forcing
-    the model to focus on the harder spoof patterns.
-    """
 
     def __init__(
         self,
