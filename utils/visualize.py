@@ -66,19 +66,7 @@ def plot_attention_heatmap(
     attn_weights: Dict[str, torch.Tensor],
     save_path: Optional[str] = None,
 ) -> None:
-    """
-    Visualise cross-attention weights cleanly.
-
-    Strategy:
-      - Each entry in attn_weights has shape (B, num_heads, N_q, N_k)
-        or (B, N_q, N_k) depending on PyTorch version.
-      - Average over batch dimension and heads to get one (N_q, N_k) map
-        per stream pair. This removes the unreadable clutter of all-heads
-        × all-positions numbers crammed into tiny cells.
-      - Show 6 clean heatmaps (one per directed stream pair) in a 2×3 grid.
-      - Add a separate head-diversity panel showing per-head entropy to
-        summarise how diverse the attention patterns are across heads.
-    """
+  
 
     PAIRS = [
         ("mel_from_lfcc", "LFCC → MEL"),
@@ -89,7 +77,6 @@ def plot_attention_heatmap(
         ("cqt_from_lfcc", "LFCC → CQT"),
     ]
 
-    # ── Figure layout ────────────────────────────────────────────────────────
     fig = plt.figure(figsize=(18, 13))
     fig.patch.set_facecolor("#0f0f1a")
 
@@ -99,13 +86,13 @@ def plot_attention_heatmap(
         hspace=0.35,
     )
 
-    # Top: 2×3 grid of averaged attention maps
+  
     top_grid = gridspec.GridSpecFromSubplotSpec(
         2, 3, subplot_spec=outer[0],
         hspace=0.45, wspace=0.3,
     )
 
-    # Bottom: head-diversity bar chart
+
     bot_ax = fig.add_subplot(outer[1])
 
     fig.suptitle(
@@ -125,25 +112,24 @@ def plot_attention_heatmap(
             ax.set_visible(False)
             continue
 
-        # w shape: (B, heads, N_q, N_k) or (B, N_q, N_k)
+        
         w_np = w.detach().cpu().float().numpy()
 
-        # squeeze batch dim (take first sample)
+       
         w_np = w_np[0]   # → (heads, N_q, N_k) or (N_q, N_k)
 
         if w_np.ndim == 3:
-            # Compute per-head entropy for the diversity panel
-            # entropy = -sum(p * log(p + 1e-9)) per row, then mean over rows and heads
+            
             eps = 1e-9
             ent = -(w_np * np.log(w_np + eps)).sum(axis=-1).mean(axis=-1)  # (heads,)
             head_entropies[title] = float(ent.mean())
-            # Average over heads for the main map
+           
             w_avg = w_np.mean(axis=0)   # (N_q, N_k)
         else:
             w_avg = w_np                # (N_q, N_k)
             head_entropies[title] = 0.0
 
-        # Plot averaged attention map
+
         im = ax.imshow(
             w_avg,
             cmap="viridis",
@@ -161,7 +147,7 @@ def plot_attention_heatmap(
         ax.set_xlabel("Source positions (key)", fontsize=8, color="#aaaacc")
         ax.set_ylabel("Query positions", fontsize=8, color="#aaaacc")
 
-        # Tick labels
+     
         N = w_avg.shape[0]
         tick_step = max(1, N // 4)
         ticks = list(range(0, N, tick_step))
@@ -171,7 +157,6 @@ def plot_attention_heatmap(
         for spine in ax.spines.values():
             spine.set_edgecolor("#444466")
 
-    # ── Head diversity bar chart ─────────────────────────────────────────────
     if head_entropies:
         labels  = [t.replace("→", "→\n") for t in head_entropies.keys()]
         heights = list(head_entropies.values())
