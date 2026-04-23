@@ -33,15 +33,7 @@ class FusionClassifier(nn.Module):
 
 
 class MFCAN(nn.Module):
-    """Multi-Feature Cross-Attention Network.
 
-    Key architecture change from v1:
-      - Encoders now output (B, 16, D) spatial sequences
-      - Cross-attention operates over the 16-position sequence
-        → produces meaningful (B, 16, 16) attention weight maps
-        → fixes the attention collapse (all-1.000 weights)
-      - Sequences are pooled AFTER fusion, not before
-    """
 
     def __init__(
         self,
